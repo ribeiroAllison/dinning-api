@@ -57,9 +57,10 @@ public class Review {
   public String getReviewerName() {
     if (user == null) {
       throw new EntityNotFound("User not found");
-    } else {
-      return user.getDisplayName();
     }
+
+    return user.getDisplayName();
+
   }
 
   public String getRestaurantName() {

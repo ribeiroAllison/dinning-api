@@ -1,5 +1,8 @@
 package com.project.Dinning.repositories;
 
-public class ReviewRepository {
+import com.project.Dinning.models.Review;
+import org.springframework.data.repository.CrudRepository;;
+
+public interface ReviewRepository extends CrudRepository<Review, Long> {
 
 }

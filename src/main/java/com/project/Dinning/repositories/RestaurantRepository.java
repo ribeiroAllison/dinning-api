@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import com.project.Dinning.models.Restaurant;
 import com.project.Dinning.enums.RestaurantType;
 
-public class RestaurantRepository {
+public interface RestaurantRepository extends CrudRepository<Restaurant, Long> {
 
 }
