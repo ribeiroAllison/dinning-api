@@ -1,5 +1,6 @@
 package com.project.Dinning.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import com.project.Dinning.repositories.ReviewRepository;
 import com.project.Dinning.repositories.UserRepository;
 import com.project.Dinning.repositories.RestaurantRepository;
 import com.project.Dinning.errors.EntityNotFound;
+import com.project.Dinning.enums.ReviewStatus;
 
 @Service
 public class ReviewService {
@@ -29,6 +31,29 @@ public class ReviewService {
   public Review createReview(Review review) {
     validateNewReview(review);
     return this.reviewRepository.save(review);
+  }
+
+  public List<Review> getReviewByStatus(ReviewStatus status) {
+    return this.reviewRepository.findByStatus(status);
+  }
+
+  public Iterable<Review> getAllReviews() {
+    return this.reviewRepository.findAll();
+  }
+
+  public List<Review> getReviewByStatusAndRestaurantId(ReviewStatus status, Long restaurantId) {
+    return this.reviewRepository.findByStatusAndRestaurant_Id(status, restaurantId);
+  }
+
+  public void updateReviewStatus(Long id, ReviewStatus status) {
+    Optional<Review> reviewToUpdate = this.reviewRepository.findById(id);
+    if (reviewToUpdate.isPresent()) {
+      Review review = reviewToUpdate.get();
+      review.setStatus(status);
+      this.reviewRepository.save(review);
+    } else {
+      throw new EntityNotFound("Review not found");
+    }
   }
 
   private void validateNewReview(Review review) {

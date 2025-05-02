@@ -16,16 +16,16 @@ public class UserController {
 
   @GetMapping("/display-name/{displayName}")
   public User getUserByDisplayName(@PathVariable("displayName") String displayName) {
-    return userService.getUserByDisplayName(displayName);
+    return this.userService.getUserByDisplayName(displayName);
   }
 
-  @PostMapping("/")
+  @PostMapping("")
   public User createUser(@RequestBody User user) {
-    return userService.createUser(user);
+    return this.userService.createUser(user);
   }
 
   @PutMapping("/{id}")
   public User editUser(@PathVariable("id") Long id, @RequestBody User user) {
-    return userService.editUser(id, user);
+    return this.userService.editUser(id, user);
   }
 }
