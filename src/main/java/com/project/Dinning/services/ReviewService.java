@@ -41,6 +41,10 @@ public class ReviewService {
     return this.reviewRepository.findAll();
   }
 
+  public Optional<Review> getReviewById(Long id) {
+    return this.reviewRepository.findById(id);
+  }
+
   public List<Review> getReviewByStatusAndRestaurantId(ReviewStatus status, Long restaurantId) {
     return this.reviewRepository.findByStatusAndRestaurant_Id(status, restaurantId);
   }

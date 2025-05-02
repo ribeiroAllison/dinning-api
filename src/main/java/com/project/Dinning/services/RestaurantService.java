@@ -5,6 +5,8 @@ import com.project.Dinning.models.Restaurant;
 import com.project.Dinning.repositories.RestaurantRepository;
 import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.errors.RestaurantAlreadyExists;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,8 +23,19 @@ public class RestaurantService {
     return this.restaurantRepository.findById(id).orElseThrow(() -> new EntityNotFound("Restaurant not found"));
   }
 
+  public List<Restaurant> getRestaurantByZipCodeAndAllergy(String zipCode, String allergy) {
+    return this.restaurantRepository.findByZipCodeAndAllergy(zipCode, allergy);
+  }
+
   public List<Restaurant> getByZipCodeAndHasScore(String zipCode) {
     return this.restaurantRepository.findByZipCodeAndScoreNotNull(zipCode);
+  }
+
+  public List<Restaurant> getAllRestaurants() {
+    List<Restaurant> restaurants = new ArrayList<>();
+    restaurantRepository.findAll().forEach(restaurants::add);
+    return restaurants;
+
   }
 
   public Restaurant createRestaurant(Restaurant restaurant) {

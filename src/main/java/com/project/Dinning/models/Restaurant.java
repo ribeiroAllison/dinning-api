@@ -44,7 +44,7 @@ public class Restaurant {
   @Basic(optional = true)
   @Min(1)
   @Max(5)
-  private Integer peauntScore;
+  private Integer peanutScore;
 
   @Column(name = "EGG_SCORE")
   @Basic(optional = true)

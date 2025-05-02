@@ -3,12 +3,14 @@ package com.project.Dinning.controllers;
 import org.springframework.web.bind.annotation.*;
 
 import com.project.Dinning.enums.ReviewStatus;
+import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.models.Review;
 import com.project.Dinning.services.ReviewService;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/reviews")
@@ -25,7 +27,7 @@ public class ReviewController {
     return this.reviewService.createReview(review);
   }
 
-  @PutMapping("/status//{id}/{status}")
+  @PutMapping("/admin/{id}/{status}")
   public String updateReviewStatus(@PathVariable("id") Long id, @PathVariable("status") ReviewStatus status) {
     try {
       this.reviewService.updateReviewStatus(id, status);
@@ -44,6 +46,11 @@ public class ReviewController {
       this.reviewService.getAllReviews().forEach(reviewList::add);
       return reviewList;
     }
+  }
+
+  @GetMapping("/{id}")
+  public Review getReviewById(@PathVariable("id") Long id) {
+    return this.reviewService.getReviewById(id).orElseThrow(() -> new EntityNotFound("Review not found " + id));
   }
 
   @GetMapping("/approved/{restaurant_id}")
