@@ -27,6 +27,14 @@ public class Restaurant {
   @Basic(optional = false)
   private String name;
 
+  @Column(name = "ADDRESS")
+  @Basic(optional = false)
+  private String address;
+
+  @Column(name = "ZIP_CODE")
+  @Basic(optional = false)
+  private String zipCode;
+
   @Column(name = "TYPE")
   @Basic(optional = false)
   @Enumerated(EnumType.STRING)
