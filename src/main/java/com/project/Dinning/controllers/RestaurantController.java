@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.project.Dinning.services.RestaurantService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/restaurants")
@@ -17,27 +19,26 @@ public class RestaurantController {
   }
 
   @PostMapping("")
-  public Restaurant createRestaurant(Restaurant restaurant) {
-    return this.restaurantService.createRestaurant(restaurant);
+  public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant restaurant) {
+    Restaurant createdRestaurant = this.restaurantService.createRestaurant(restaurant);
+    return new ResponseEntity<>(createdRestaurant, HttpStatus.CREATED);
   }
 
   @GetMapping("/{id}")
-  public Restaurant getRestaurantById(@PathVariable("id") Long id) {
-    return this.restaurantService.getRestaurantById(id);
+  public ResponseEntity<Restaurant> getRestaurantById(@PathVariable("id") Long id) {
+    Restaurant restaurant = this.restaurantService.getRestaurantById(id);
+    return ResponseEntity.ok(restaurant);
   }
 
   @GetMapping("")
-  public List<Restaurant> getRestaurantByZipCodeAndAllergy(
+  public ResponseEntity<List<Restaurant>> getRestaurants(
       @RequestParam(required = false) String zipCode,
       @RequestParam(required = false) String allergy,
       @RequestParam(required = false) Boolean hasScore) {
-    if (zipCode != null && allergy != null) {
-      return this.restaurantService.getRestaurantByZipCodeAndAllergy(zipCode, allergy);
-    } else if (zipCode != null && hasScore) {
-      return this.restaurantService.getByZipCodeAndHasScore(zipCode);
-    } else {
-      return this.restaurantService.getAllRestaurants();
-    }
+
+    List<Restaurant> restaurants = this.restaurantService.getRestaurants(zipCode, allergy, hasScore);
+    return ResponseEntity.ok(restaurants);
+
   }
 
 }

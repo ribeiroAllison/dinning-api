@@ -1,10 +1,12 @@
 package com.project.Dinning.services;
 
 import org.springframework.stereotype.Service;
+
 import com.project.Dinning.models.Restaurant;
 import com.project.Dinning.repositories.RestaurantRepository;
 import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.errors.RestaurantAlreadyExists;
+import com.project.Dinning.errors.NoResultsFound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +25,35 @@ public class RestaurantService {
     return this.restaurantRepository.findById(id).orElseThrow(() -> new EntityNotFound("Restaurant not found"));
   }
 
-  public List<Restaurant> getRestaurantByZipCodeAndAllergy(String zipCode, String allergy) {
+  public List<Restaurant> getRestaurants(
+      String zipCode,
+      String allergy,
+      Boolean hasScore) {
+    List<Restaurant> restaurantList;
+    if (zipCode != null && allergy != null) {
+      restaurantList = this.getRestaurantByZipCodeAndAllergy(zipCode, allergy);
+    } else if (zipCode != null && hasScore) {
+      restaurantList = this.getByZipCodeAndHasScore(zipCode);
+    } else {
+      restaurantList = this.getAllRestaurants();
+    }
+    if (restaurantList.isEmpty()) {
+      throw new NoResultsFound("No results match your search");
+    } else {
+      return restaurantList;
+    }
+
+  }
+
+  private List<Restaurant> getRestaurantByZipCodeAndAllergy(String zipCode, String allergy) {
     return this.restaurantRepository.findByZipCodeAndAllergy(zipCode, allergy);
   }
 
-  public List<Restaurant> getByZipCodeAndHasScore(String zipCode) {
+  private List<Restaurant> getByZipCodeAndHasScore(String zipCode) {
     return this.restaurantRepository.findByZipCodeAndScoreNotNull(zipCode);
   }
 
-  public List<Restaurant> getAllRestaurants() {
+  private List<Restaurant> getAllRestaurants() {
     List<Restaurant> restaurants = new ArrayList<>();
     restaurantRepository.findAll().forEach(restaurants::add);
     return restaurants;
