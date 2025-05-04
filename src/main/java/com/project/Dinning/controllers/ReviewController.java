@@ -50,6 +50,7 @@ public class ReviewController {
     return ResponseEntity.ok("Review rejected successfully");
   }
 
+  // This is an example of manual Pageable creation
   @GetMapping("")
   public ResponseEntity<Page<Review>> getReviews(
       @RequestParam(required = false) ReviewStatus status,
@@ -65,6 +66,8 @@ public class ReviewController {
     return ResponseEntity.ok(this.reviewService.getReviewById(id));
   }
 
+  // This is getting its Pageable set up from properties file and automatically
+  // implementing it
   @GetMapping("/approved/{restaurant_id}")
   public ResponseEntity<Page<Review>> getApprovedReviewsByRestaurant(
       @PathVariable("restaurant_id") Long restaurantId, Pageable pageable) {
