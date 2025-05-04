@@ -7,9 +7,8 @@ import com.project.Dinning.repositories.RestaurantRepository;
 import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.errors.RestaurantAlreadyExists;
 import com.project.Dinning.errors.NoResultsFound;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class RestaurantService {
@@ -25,17 +24,18 @@ public class RestaurantService {
     return this.restaurantRepository.findById(id).orElseThrow(() -> new EntityNotFound("Restaurant not found"));
   }
 
-  public List<Restaurant> getRestaurants(
+  public Page<Restaurant> getRestaurants(
       String zipCode,
       String allergy,
-      Boolean hasScore) {
-    List<Restaurant> restaurantList;
+      Boolean hasScore,
+      Pageable pageable) {
+    Page<Restaurant> restaurantList;
     if (zipCode != null && allergy != null) {
-      restaurantList = this.getRestaurantByZipCodeAndAllergy(zipCode, allergy);
+      restaurantList = this.getRestaurantByZipCodeAndAllergy(zipCode, allergy, pageable);
     } else if (zipCode != null && hasScore) {
-      restaurantList = this.getByZipCodeAndHasScore(zipCode);
+      restaurantList = this.getByZipCodeAndHasScore(zipCode, pageable);
     } else {
-      restaurantList = this.getAllRestaurants();
+      restaurantList = this.getAllRestaurants(pageable);
     }
     if (restaurantList.isEmpty()) {
       throw new NoResultsFound("No results match your search");
@@ -45,17 +45,28 @@ public class RestaurantService {
 
   }
 
-  private List<Restaurant> getRestaurantByZipCodeAndAllergy(String zipCode, String allergy) {
-    return this.restaurantRepository.findByZipCodeAndAllergy(zipCode, allergy);
+  private Page<Restaurant> getRestaurantByZipCodeAndAllergy(String zipCode, String allergy, Pageable pageable) {
+    Page<Restaurant> restaurants = this.restaurantRepository.findByZipCodeAndAllergy(zipCode, allergy, pageable);
+    if (restaurants.isEmpty()) {
+      throw new NoResultsFound("No results match your zip code " + zipCode + " and allergy " + allergy);
+    }
+    return restaurants;
   }
 
-  private List<Restaurant> getByZipCodeAndHasScore(String zipCode) {
-    return this.restaurantRepository.findByZipCodeAndScoreNotNull(zipCode);
+  private Page<Restaurant> getByZipCodeAndHasScore(String zipCode, Pageable pageable) {
+    Page<Restaurant> restaurants = this.restaurantRepository.findByZipCodeAndScoreNotNull(zipCode, pageable);
+    if (restaurants.isEmpty()) {
+      throw new NoResultsFound("No results match your zip code " + zipCode + " and has score");
+    }
+    return restaurants;
   }
 
-  private List<Restaurant> getAllRestaurants() {
-    List<Restaurant> restaurants = new ArrayList<>();
-    restaurantRepository.findAll().forEach(restaurants::add);
+  private Page<Restaurant> getAllRestaurants(Pageable pageable) {
+
+    Page<Restaurant> restaurants = this.restaurantRepository.findAll(pageable);
+    if (restaurants.isEmpty()) {
+      throw new NoResultsFound("No restaurants found");
+    }
     return restaurants;
 
   }
@@ -66,13 +77,11 @@ public class RestaurantService {
   }
 
   private void validateRestaurant(Restaurant restaurant) {
-    List<Restaurant> existingRestaurants = restaurantRepository.findByNameAndZipCode(
-        restaurant.getName(),
+    boolean restaurantExists = this.restaurantRepository.existsByNameAndZipCode(restaurant.getName(),
         restaurant.getZipCode());
-
-    if (!existingRestaurants.isEmpty()) {
-      throw new RestaurantAlreadyExists("Restaurant already exists with the same name " + restaurant.getName()
-          + "and zip-code: " + restaurant.getZipCode());
+    if (restaurantExists) {
+      throw new RestaurantAlreadyExists("Restaurant already exists with name '" +
+          restaurant.getName() + "' and zip code '" + restaurant.getZipCode() + "'");
     }
   }
 

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import com.project.Dinning.enums.ReviewStatus;
-import com.project.Dinning.errors.EntityNotFound;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Getter
@@ -25,50 +25,45 @@ public class Review {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "USER_ID", nullable = false)
+  @NotNull(message = "User is required")
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "RESTAURANT_ID", nullable = false)
+  @NotNull(message = "Restaurant is required")
   private Restaurant restaurant;
 
   @Column(name = "PEANUT_SCORE")
+  @Basic(optional = true)
   @Min(value = 1, message = "Score must be at least 1")
   @Max(value = 5, message = "Score must be at most 5")
-  private Integer peauntScore;
+  private Integer peanutScore;
 
   @Column(name = "EGG_SCORE")
+  @Basic(optional = true)
   @Min(value = 1, message = "Score must be at least 1")
   @Max(value = 5, message = "Score must be at most 5")
   private Integer eggScore;
 
   @Column(name = "DAIRY_SCORE")
+  @Basic(optional = true)
   @Min(value = 1, message = "Score must be at least 1")
   @Max(value = 5, message = "Score must be at most 5")
   private Integer dairyScore;
 
   @Column(name = "COMMENTARY")
+  @Basic(optional = true)
   @Size(max = 255, message = "Commentary must be at most 255 characters")
   private String commentary;
 
   @Column(name = "STATUS")
   @Enumerated(EnumType.STRING)
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private ReviewStatus status = ReviewStatus.PENDING;
 
-  public String getReviewerName() {
-    if (user == null) {
-      throw new EntityNotFound("User not found");
-    }
-
-    return user.getDisplayName();
-
-  }
-
-  public String getRestaurantName() {
-    if (restaurant == null) {
-      throw new EntityNotFound("Restaurant not found");
-    } else {
-      return restaurant.getName();
-    }
+  @AssertTrue(message = "At least one score must be provided")
+  private boolean isAtLeastOneScoreProvided() {
+    return peanutScore != null || eggScore != null || dairyScore != null;
   }
 
 }
