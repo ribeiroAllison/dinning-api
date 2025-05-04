@@ -2,6 +2,9 @@ package com.project.Dinning.controllers;
 
 import org.springframework.web.bind.annotation.*;
 import com.project.Dinning.services.UserService;
+
+import jakarta.validation.Valid;
+
 import com.project.Dinning.models.User;
 
 @RestController
@@ -20,12 +23,12 @@ public class UserController {
   }
 
   @PostMapping("")
-  public User createUser(@RequestBody User user) {
+  public User createUser(@Valid @RequestBody User user) {
     return this.userService.createUser(user);
   }
 
   @PutMapping("/{id}")
-  public User editUser(@PathVariable("id") Long id, @RequestBody User user) {
+  public User editUser(@PathVariable("id") Long id, @Valid @RequestBody User user) {
     return this.userService.editUser(id, user);
   }
 }
