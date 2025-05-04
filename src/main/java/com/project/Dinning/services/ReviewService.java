@@ -1,10 +1,8 @@
 package com.project.Dinning.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-
 import com.project.Dinning.models.Restaurant;
 import com.project.Dinning.models.Review;
 import com.project.Dinning.models.User;
@@ -13,7 +11,8 @@ import com.project.Dinning.repositories.UserRepository;
 import com.project.Dinning.repositories.RestaurantRepository;
 import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.enums.ReviewStatus;
-import java.util.ArrayList;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ReviewService {
@@ -34,11 +33,11 @@ public class ReviewService {
     return this.reviewRepository.save(review);
   }
 
-  public List<Review> getReviews(ReviewStatus status) {
+  public Page<Review> getReviews(ReviewStatus status, Pageable pageable) {
     if (status != null) {
-      return this.getReviewByStatus(status);
+      return this.getReviewByStatus(status, pageable);
     } else {
-      return this.getAllReviews();
+      return this.getAllReviews(pageable);
     }
   }
 
@@ -58,30 +57,8 @@ public class ReviewService {
     }
   }
 
-  public void changeStatusToApproved(Long id) {
-    Optional<Review> reviewToUpdate = this.reviewRepository.findById(id);
-    if (reviewToUpdate.isPresent()) {
-      Review review = reviewToUpdate.get();
-      review.setStatus(ReviewStatus.APPROVED);
-      this.reviewRepository.save(review);
-    } else {
-      throw new EntityNotFound("Review not found");
-    }
-  }
-
-  public void changeStatusToRejected(Long id) {
-    Optional<Review> reviewToUpdate = this.reviewRepository.findById(id);
-    if (reviewToUpdate.isPresent()) {
-      Review review = reviewToUpdate.get();
-      review.setStatus(ReviewStatus.REJECTED);
-      this.reviewRepository.save(review);
-    } else {
-      throw new EntityNotFound("Review not found");
-    }
-  }
-
-  public List<Review> getByApprovedStatusAndId(Long id) {
-    List<Review> reviews = this.getReviewByStatusAndRestaurantId(ReviewStatus.APPROVED, id);
+  public Page<Review> getByApprovedStatusAndId(Long id, Pageable pageable) {
+    Page<Review> reviews = this.getReviewByStatusAndRestaurantId(ReviewStatus.APPROVED, id, pageable);
     if (reviews.isEmpty()) {
       throw new EntityNotFound("No approved reviews found for restaurant with id " + id);
     }
@@ -89,8 +66,13 @@ public class ReviewService {
     return reviews;
   }
 
-  private List<Review> getReviewByStatusAndRestaurantId(ReviewStatus status, Long restaurantId) {
-    return this.reviewRepository.findByStatusAndRestaurant_Id(status, restaurantId);
+  private Page<Review> getReviewByStatusAndRestaurantId(ReviewStatus status, Long restaurantId, Pageable pageable) {
+    Page<Review> reviews = this.reviewRepository.findByStatusAndRestaurant_Id(status, restaurantId, pageable);
+    if (reviews.isEmpty()) {
+      throw new EntityNotFound(
+          "No reviews found with status " + status.getDisplayName() + " for restaurant with id " + restaurantId);
+    }
+    return reviews;
   }
 
   private void validateNewReview(Review review) {
@@ -105,17 +87,17 @@ public class ReviewService {
 
   }
 
-  private List<Review> getReviewByStatus(ReviewStatus status) {
-    List<Review> reviews = this.reviewRepository.findByStatus(status);
+  private Page<Review> getReviewByStatus(ReviewStatus status, Pageable pageable) {
+    Page<Review> reviews = this.reviewRepository.findByStatus(status, pageable);
     if (reviews.isEmpty()) {
       throw new EntityNotFound("No reviews found with status " + status.getDisplayName());
     }
     return reviews;
   }
 
-  private List<Review> getAllReviews() {
-    List<Review> reviews = new ArrayList<>();
-    this.reviewRepository.findAll().forEach(reviews::add);
+  private Page<Review> getAllReviews(Pageable pageable) {
+
+    Page<Review> reviews = this.reviewRepository.findAll(pageable);
     if (reviews.isEmpty()) {
       throw new EntityNotFound("No reviews found");
     }

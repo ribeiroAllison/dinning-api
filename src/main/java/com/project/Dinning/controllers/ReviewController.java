@@ -8,11 +8,12 @@ import com.project.Dinning.services.ReviewService;
 
 import jakarta.validation.Valid;
 
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/reviews")
@@ -39,19 +40,24 @@ public class ReviewController {
 
   @PutMapping("/admin/{id}/approve")
   public ResponseEntity<String> changeStatusToApproved(@PathVariable("id") Long id) {
-    this.reviewService.changeStatusToApproved(id);
+    this.reviewService.updateReviewStatus(id, ReviewStatus.APPROVED);
     return ResponseEntity.ok("Review approved successfully");
   }
 
   @PutMapping("/admin/{id}/reject")
   public ResponseEntity<String> changeStatusToRejected(@PathVariable("id") Long id) {
-    this.reviewService.changeStatusToRejected(id);
+    this.reviewService.updateReviewStatus(id, ReviewStatus.REJECTED);
     return ResponseEntity.ok("Review rejected successfully");
   }
 
   @GetMapping("")
-  public ResponseEntity<List<Review>> getReviews(@RequestParam(required = false) ReviewStatus status) {
-    return ResponseEntity.ok(this.reviewService.getReviews(status));
+  public ResponseEntity<Page<Review>> getReviews(
+      @RequestParam(required = false) ReviewStatus status,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(defaultValue = "id") String sort) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+    return ResponseEntity.ok(this.reviewService.getReviews(status, pageable));
   }
 
   @GetMapping("/{id}")
@@ -60,7 +66,8 @@ public class ReviewController {
   }
 
   @GetMapping("/approved/{restaurant_id}")
-  public ResponseEntity<List<Review>> getApprovedReviewsByRestaurant(@PathVariable("restaurant_id") Long restaurantId) {
-    return ResponseEntity.ok(this.reviewService.getByApprovedStatusAndId(restaurantId));
+  public ResponseEntity<Page<Review>> getApprovedReviewsByRestaurant(
+      @PathVariable("restaurant_id") Long restaurantId, Pageable pageable) {
+    return ResponseEntity.ok(this.reviewService.getByApprovedStatusAndId(restaurantId, pageable));
   }
 }
