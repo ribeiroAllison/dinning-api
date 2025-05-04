@@ -40,7 +40,7 @@ public class Restaurant {
   @Enumerated(EnumType.STRING)
   private RestaurantType type;
 
-  @Column(name = "PEAUNT_SCORE")
+  @Column(name = "PEANUT_SCORE")
   @Basic(optional = true)
   @Min(1)
   @Max(5)

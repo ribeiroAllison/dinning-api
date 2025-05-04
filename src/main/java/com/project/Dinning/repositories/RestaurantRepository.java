@@ -12,7 +12,7 @@ public interface RestaurantRepository extends CrudRepository<Restaurant, Long> {
 
   List<Restaurant> findByNameAndZipCode(String name, String zipCode);
 
-  @Query("SELECT r FROM Restaurant r WHERE r.zipCode = :zipCode AND (r.peauntScore IS NOT NULL OR r.eggScore IS NOT NULL OR r.dairyScore IS NOT NULL) ORDER BY r.name DESC")
+  @Query("SELECT r FROM Restaurant r WHERE r.zipCode = :zipCode AND (r.peanutScore IS NOT NULL OR r.eggScore IS NOT NULL OR r.dairyScore IS NOT NULL) ORDER BY r.name DESC")
   List<Restaurant> findByZipCodeAndScoreNotNull(
       @Param("zipCode") String zipCode);
 

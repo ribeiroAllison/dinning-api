@@ -3,14 +3,16 @@ package com.project.Dinning.controllers;
 import org.springframework.web.bind.annotation.*;
 
 import com.project.Dinning.enums.ReviewStatus;
-import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.models.Review;
 import com.project.Dinning.services.ReviewService;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/reviews")
@@ -23,38 +25,42 @@ public class ReviewController {
   }
 
   @PostMapping("")
-  public Review createReview(@RequestBody Review review) {
-    return this.reviewService.createReview(review);
+  public ResponseEntity<Review> createReview(@Valid @RequestBody Review review) {
+    Review newReview = this.reviewService.createReview(review);
+    return new ResponseEntity<>(newReview, HttpStatus.CREATED);
   }
 
   @PutMapping("/admin/{id}/{status}")
-  public String updateReviewStatus(@PathVariable("id") Long id, @PathVariable("status") ReviewStatus status) {
-    try {
-      this.reviewService.updateReviewStatus(id, status);
-      return "Review status updated successfully";
-    } catch (Exception e) {
-      return "Error updating review status: " + e.getMessage();
-    }
+  public ResponseEntity<String> updateReviewStatus(@PathVariable("id") Long id,
+      @PathVariable("status") ReviewStatus status) {
+    this.reviewService.updateReviewStatus(id, status);
+    return ResponseEntity.ok("Review status updated successfully");
+  }
+
+  @PutMapping("/admin/{id}/approve")
+  public ResponseEntity<String> changeStatusToApproved(@PathVariable("id") Long id) {
+    this.reviewService.changeStatusToApproved(id);
+    return ResponseEntity.ok("Review approved successfully");
+  }
+
+  @PutMapping("/admin/{id}/reject")
+  public ResponseEntity<String> changeStatusToRejected(@PathVariable("id") Long id) {
+    this.reviewService.changeStatusToRejected(id);
+    return ResponseEntity.ok("Review rejected successfully");
   }
 
   @GetMapping("")
-  public List<Review> getReviews(@RequestParam(required = false) ReviewStatus status) {
-    if (status != null) {
-      return this.reviewService.getReviewByStatus(status);
-    } else {
-      List<Review> reviewList = new ArrayList<>();
-      this.reviewService.getAllReviews().forEach(reviewList::add);
-      return reviewList;
-    }
+  public ResponseEntity<List<Review>> getReviews(@RequestParam(required = false) ReviewStatus status) {
+    return ResponseEntity.ok(this.reviewService.getReviews(status));
   }
 
   @GetMapping("/{id}")
-  public Review getReviewById(@PathVariable("id") Long id) {
-    return this.reviewService.getReviewById(id).orElseThrow(() -> new EntityNotFound("Review not found " + id));
+  public ResponseEntity<Review> getReviewById(@PathVariable("id") Long id) {
+    return ResponseEntity.ok(this.reviewService.getReviewById(id));
   }
 
   @GetMapping("/approved/{restaurant_id}")
-  public List<Review> getApprovedReviewsByRestaurant(@PathVariable("restaurant_id") Long restaurantId) {
-    return this.reviewService.getReviewByStatusAndRestaurantId(ReviewStatus.APPROVED, restaurantId);
+  public ResponseEntity<List<Review>> getApprovedReviewsByRestaurant(@PathVariable("restaurant_id") Long restaurantId) {
+    return ResponseEntity.ok(this.reviewService.getByApprovedStatusAndId(restaurantId));
   }
 }
