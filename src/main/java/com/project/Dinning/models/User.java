@@ -8,7 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Represents a user in the dining review system.
@@ -18,25 +19,28 @@ import lombok.AllArgsConstructor;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 @Table(name = "USERS", uniqueConstraints = {
     @UniqueConstraint(columnNames = "DISPLAY_NAME")
 })
 public class User {
 
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @NonNull
   @Id
   @Column(name = "USER_ID")
   private Long id;
 
   @Column(name = "DISPLAY_NAME")
+  @NonNull
   @NotBlank(message = "Display name cannot be blank")
   @Size(max = 50, message = "Display name cannot be longer than 50 characters")
   @Basic(optional = false)
   private String displayName;
 
   @Column(name = "CITY")
+  @NonNull
   @NotBlank(message = "City cannot be blank")
   @Pattern(regexp = "^[a-zA-Z\\s-]+$", message = "City must contain only letters, spaces, and hyphens")
   @Size(max = 50, message = "City cannot be longer than 50 characters")
@@ -44,6 +48,7 @@ public class User {
   private String city;
 
   @Column(name = "ZIP_CODE")
+  @NonNull
   @NotBlank(message = "Zip code cannot be blank")
   @Pattern(regexp = "\\d{8}", message = "ZIP code must be 8 digits")
   @Basic(optional = false)
