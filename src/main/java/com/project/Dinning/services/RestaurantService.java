@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.project.Dinning.models.Restaurant;
 import com.project.Dinning.repositories.RestaurantRepository;
 import com.project.Dinning.errors.EntityNotFound;
-import com.project.Dinning.errors.RestaurantAlreadyExists;
+import com.project.Dinning.errors.EntityAlreadyExists;
 import com.project.Dinning.errors.NoResultsFound;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,7 +80,7 @@ public class RestaurantService {
     boolean restaurantExists = this.restaurantRepository.existsByNameAndZipCode(restaurant.getName(),
         restaurant.getZipCode());
     if (restaurantExists) {
-      throw new RestaurantAlreadyExists("Restaurant already exists with name '" +
+      throw new EntityAlreadyExists("Restaurant already exists with name '" +
           restaurant.getName() + "' and zip code '" + restaurant.getZipCode() + "'");
     }
   }
