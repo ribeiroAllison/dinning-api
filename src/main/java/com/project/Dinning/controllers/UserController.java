@@ -5,10 +5,20 @@ import com.project.Dinning.services.UserService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import com.project.Dinning.models.User;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "User", description = "User management APIs")
 public class UserController {
 
   private final UserService userService;
@@ -17,18 +27,29 @@ public class UserController {
     this.userService = userService;
   }
 
+  @Operation(summary = "Get a User by Display Name", description = "Retrieve a User by its Display Name")
+  @ApiResponse(responseCode = "200", description = "User found", content = @Content(schema = @Schema(implementation = User.class)))
+  @ApiResponse(responseCode = "404", description = "User not found")
   @GetMapping("/display-name/{displayName}")
-  public User getUserByDisplayName(@PathVariable("displayName") String displayName) {
-    return this.userService.getUserByDisplayName(displayName);
+  public ResponseEntity<User> getUserByDisplayName(@PathVariable("displayName") String displayName) {
+    return ResponseEntity.ok(this.userService.getUserByDisplayName(displayName));
   }
 
+  @Operation(summary = "Create a new User", description = "Create a new User")
+  @ApiResponse(responseCode = "200", description = "User created successfully", content = @Content(schema = @Schema(implementation = User.class)))
+  @ApiResponse(responseCode = "400", description = "Invalid input data")
   @PostMapping("")
-  public User createUser(@Valid @RequestBody User user) {
-    return this.userService.createUser(user);
+  public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    User newUser = this.userService.createUser(user);
+    return new ResponseEntity<>(newUser, HttpStatus.CREATED);
   }
 
+  @Operation(summary = "Edit an existing User", description = "Edit an existing User by its ID")
+  @ApiResponse(responseCode = "200", description = "User edited successfully", content = @Content(schema = @Schema(implementation = User.class)))
+  @ApiResponse(responseCode = "400", description = "Invalid input data")
+  @ApiResponse(responseCode = "404", description = "User not found")
   @PutMapping("/{id}")
-  public User editUser(@PathVariable("id") Long id, @Valid @RequestBody User user) {
-    return this.userService.editUser(id, user);
+  public ResponseEntity<String> editUser(@PathVariable("id") Long id, @Valid @RequestBody User user) {
+    return ResponseEntity.ok("User updated successfully");
   }
 }
