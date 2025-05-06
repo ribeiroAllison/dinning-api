@@ -1,5 +1,6 @@
 package com.project.Dinning.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.enums.ReviewStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.Objects;
 
 @Service
 public class ReviewService {
@@ -75,6 +77,8 @@ public class ReviewService {
       Review review = reviewToUpdate.get();
       review.setStatus(status);
       this.reviewRepository.save(review);
+      this.updateRestaurantScore(review.getRestaurant().getId());
+
     } else {
       throw new EntityNotFound("Review not found");
     }
@@ -87,6 +91,44 @@ public class ReviewService {
     }
 
     return reviewMapper.toDTOPage(reviews);
+  }
+
+  private void updateRestaurantScore(Long restaurnantId) {
+    Restaurant restaurant = this.restaurantRepository.findById(restaurnantId)
+        .orElseThrow(() -> new EntityNotFound("Restaurant not found with id " + restaurnantId));
+    Double originalEggScore = restaurant.getEggScoreAverage();
+    Double originalDairyScore = restaurant.getDairyScoreAverage();
+    Double originalPeanutScore = restaurant.getPeanutScoreAverage();
+    List<Review> approvedReviews = this.reviewRepository.findApprovedReviewsByRestaurant(restaurnantId);
+
+    double avgEggScore = approvedReviews.stream()
+        .filter(review -> review.getEggScore() != null)
+        .mapToInt(Review::getEggScore)
+        .average()
+        .orElse(0.0);
+
+    double avgDairyScore = approvedReviews.stream()
+        .filter(review -> review.getDairyScore() != null)
+        .mapToInt(Review::getDairyScore)
+        .average()
+        .orElse(0.0);
+
+    double avgPeanutScore = approvedReviews.stream()
+        .filter(review -> review.getPeanutScore() != null)
+        .mapToInt(Review::getPeanutScore)
+        .average()
+        .orElse(0.0);
+
+    restaurant.setEggScoreAverage(avgEggScore > 0.0 ? avgEggScore : null);
+    restaurant.setDairyScoreAverage(avgDairyScore > 0.0 ? avgDairyScore : null);
+    restaurant.setPeanutScoreAverage(avgPeanutScore > 0.0 ? avgPeanutScore : null);
+
+    if (!Objects.equals(restaurant.getEggScoreAverage(), originalEggScore)
+        || !Objects.equals(restaurant.getDairyScoreAverage(), originalDairyScore)
+        || !Objects.equals(restaurant.getPeanutScoreAverage(), originalPeanutScore)) {
+      this.restaurantRepository.save(restaurant);
+    }
+
   }
 
   private Page<Review> getReviewByStatusAndRestaurantId(ReviewStatus status, Long restaurantId, Pageable pageable) {
