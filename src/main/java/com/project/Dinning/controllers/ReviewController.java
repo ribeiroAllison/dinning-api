@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.Dinning.enums.ReviewStatus;
 import com.project.Dinning.dto.ReviewDTO;
+import com.project.Dinning.dto.ReviewResponseDTO;
 import com.project.Dinning.models.Review;
 import com.project.Dinning.services.ReviewService;
 
@@ -75,21 +76,21 @@ public class ReviewController {
   @ApiResponse(responseCode = "200", description = "List of reviews", content = @Content(schema = @Schema(implementation = Review.class)))
   @ApiResponse(responseCode = "404", description = "No Reviews Found")
   @GetMapping("")
-  public ResponseEntity<Page<Review>> getReviews(
+  public ResponseEntity<Page<ReviewResponseDTO>> getReviews(
       @RequestParam(required = false) ReviewStatus status,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(defaultValue = "id") String sort) {
     Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-    return ResponseEntity.ok(this.reviewService.getReviews(status, pageable));
+    return ResponseEntity.ok(this.reviewService.getReviewsDTO(status, pageable));
   }
 
   @Operation(summary = "Get a Review by ID", description = "Retrieve a Review by its ID")
   @ApiResponse(responseCode = "200", description = "Review found", content = @Content(schema = @Schema(implementation = Review.class)))
   @ApiResponse(responseCode = "404", description = "Review not found")
   @GetMapping("/{id}")
-  public ResponseEntity<Review> getReviewById(@PathVariable("id") Long id) {
-    return ResponseEntity.ok(this.reviewService.getReviewById(id));
+  public ResponseEntity<ReviewResponseDTO> getReviewById(@PathVariable("id") Long id) {
+    return ResponseEntity.ok(this.reviewService.getReviewDTOById(id));
   }
 
   // This is getting its Pageable set up from properties file and automatically
@@ -98,7 +99,7 @@ public class ReviewController {
   @ApiResponse(responseCode = "200", description = "List of approved reviews", content = @Content(schema = @Schema(implementation = Review.class)))
   @ApiResponse(responseCode = "404", description = "No Reviews Found")
   @GetMapping("/approved/{restaurant_id}")
-  public ResponseEntity<Page<Review>> getApprovedReviewsByRestaurant(
+  public ResponseEntity<Page<ReviewResponseDTO>> getApprovedReviewsByRestaurant(
       @PathVariable("restaurant_id") Long restaurantId, Pageable pageable) {
     return ResponseEntity.ok(this.reviewService.getByApprovedStatusAndId(restaurantId, pageable));
   }

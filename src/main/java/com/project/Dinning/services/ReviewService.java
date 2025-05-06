@@ -5,7 +5,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import com.project.Dinning.models.Restaurant;
 import com.project.Dinning.dto.ReviewDTO;
+import com.project.Dinning.dto.ReviewResponseDTO;
 import com.project.Dinning.models.Review;
+import com.project.Dinning.mappers.ReviewMapper;
 import com.project.Dinning.models.User;
 import com.project.Dinning.repositories.ReviewRepository;
 import com.project.Dinning.repositories.UserRepository;
@@ -21,12 +23,14 @@ public class ReviewService {
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
   private final RestaurantRepository restaurantRepository;
+  private final ReviewMapper reviewMapper;
 
   public ReviewService(ReviewRepository reviewRepository, UserRepository userRepository,
-      RestaurantRepository restaurantRepository) {
+      RestaurantRepository restaurantRepository, ReviewMapper reviewMapper) {
     this.reviewRepository = reviewRepository;
     this.userRepository = userRepository;
     this.restaurantRepository = restaurantRepository;
+    this.reviewMapper = reviewMapper;
   }
 
   public Review createReviewFromDTO(ReviewDTO reviewDTO) {
@@ -47,17 +51,22 @@ public class ReviewService {
     return this.reviewRepository.save(review);
   }
 
-  public Page<Review> getReviews(ReviewStatus status, Pageable pageable) {
+  public Page<ReviewResponseDTO> getReviewsDTO(ReviewStatus status, Pageable pageable) {
+    Page<Review> reviews;
     if (status != null) {
-      return this.getReviewByStatus(status, pageable);
+      reviews = this.getReviewByStatus(status, pageable);
     } else {
-      return this.getAllReviews(pageable);
+      reviews = this.getAllReviews(pageable);
     }
+
+    return reviewMapper.toDTOPage(reviews);
   }
 
-  public Review getReviewById(Long id) {
-    return this.reviewRepository.findById(id)
+  public ReviewResponseDTO getReviewDTOById(Long id) {
+    Review review = this.reviewRepository.findById(id)
         .orElseThrow(() -> new EntityNotFound("Review not found with id " + id));
+
+    return reviewMapper.toDTO(review);
   }
 
   public void updateReviewStatus(Long id, ReviewStatus status) {
@@ -71,13 +80,13 @@ public class ReviewService {
     }
   }
 
-  public Page<Review> getByApprovedStatusAndId(Long id, Pageable pageable) {
+  public Page<ReviewResponseDTO> getByApprovedStatusAndId(Long id, Pageable pageable) {
     Page<Review> reviews = this.getReviewByStatusAndRestaurantId(ReviewStatus.APPROVED, id, pageable);
     if (reviews.isEmpty()) {
       throw new EntityNotFound("No approved reviews found for restaurant with id " + id);
     }
 
-    return reviews;
+    return reviewMapper.toDTOPage(reviews);
   }
 
   private Page<Review> getReviewByStatusAndRestaurantId(ReviewStatus status, Long restaurantId, Pageable pageable) {
