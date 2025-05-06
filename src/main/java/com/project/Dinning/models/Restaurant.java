@@ -3,7 +3,6 @@ package com.project.Dinning.models;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import com.project.Dinning.enums.RestaurantType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -17,7 +16,6 @@ import jakarta.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "RESTAURANT")
 public class Restaurant {
 
@@ -67,5 +65,23 @@ public class Restaurant {
   @Min(value = 1, message = "Dairy score must be at least 1")
   @Max(value = 5, message = "Dairy score cannot be greater than 5")
   private Integer dairyScore;
+
+  /**
+   * Custom constructor that ensures scores are null on creation
+   */
+  public Restaurant(String name, String address, String zipCode, RestaurantType type) {
+    this.name = name;
+    this.address = address;
+    this.zipCode = zipCode;
+    this.type = type;
+    // Scores are intentionally not set, so they remain null
+  }
+
+  /**
+   * Builder method to create a new Restaurant with required fields only
+   */
+  public static Restaurant createRestaurant(String name, String address, String zipCode, RestaurantType type) {
+    return new Restaurant(name, address, zipCode, type);
+  }
 
 }

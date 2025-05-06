@@ -4,6 +4,7 @@ import com.project.Dinning.models.Restaurant;
 import org.springframework.web.bind.annotation.*;
 
 import com.project.Dinning.services.RestaurantService;
+import com.project.Dinning.dto.RestaurantCreateDTO;
 
 import jakarta.validation.Valid;
 
@@ -34,7 +35,7 @@ public class RestaurantController {
   @ApiResponse(responseCode = "400", description = "Invalid input")
   @ApiResponse(responseCode = "409", description = "Restaurant already exists")
   @PostMapping("")
-  public ResponseEntity<Restaurant> createRestaurant(@Valid @RequestBody Restaurant restaurant) {
+  public ResponseEntity<Restaurant> createRestaurant(@Valid @RequestBody RestaurantCreateDTO restaurant) {
     Restaurant createdRestaurant = this.restaurantService.createRestaurant(restaurant);
     return new ResponseEntity<>(createdRestaurant, HttpStatus.CREATED);
   }
@@ -57,7 +58,6 @@ public class RestaurantController {
       @RequestParam(required = false) String allergy,
       @RequestParam(required = false) Boolean hasScore,
       Pageable pageable) {
-
     Page<Restaurant> restaurants = this.restaurantService.getRestaurants(zipCode, allergy, hasScore, pageable);
     return ResponseEntity.ok(restaurants);
 

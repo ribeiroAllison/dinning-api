@@ -3,6 +3,7 @@ package com.project.Dinning.services;
 import org.springframework.stereotype.Service;
 
 import com.project.Dinning.models.Restaurant;
+import com.project.Dinning.dto.RestaurantCreateDTO;
 import com.project.Dinning.repositories.RestaurantRepository;
 import com.project.Dinning.errors.EntityNotFound;
 import com.project.Dinning.errors.EntityAlreadyExists;
@@ -71,12 +72,14 @@ public class RestaurantService {
 
   }
 
-  public Restaurant createRestaurant(Restaurant restaurant) {
+  public Restaurant createRestaurant(RestaurantCreateDTO restaurant) {
     validateRestaurant(restaurant);
-    return restaurantRepository.save(restaurant);
+    Restaurant newRestaurant = Restaurant.createRestaurant(restaurant.getName(), restaurant.getAddress(),
+        restaurant.getZipCode(), restaurant.getType());
+    return restaurantRepository.save(newRestaurant);
   }
 
-  private void validateRestaurant(Restaurant restaurant) {
+  private void validateRestaurant(RestaurantCreateDTO restaurant) {
     boolean restaurantExists = this.restaurantRepository.existsByNameAndZipCode(restaurant.getName(),
         restaurant.getZipCode());
     if (restaurantExists) {
