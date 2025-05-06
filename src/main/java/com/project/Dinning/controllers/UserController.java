@@ -36,7 +36,7 @@ public class UserController {
   }
 
   @Operation(summary = "Create a new User", description = "Create a new User")
-  @ApiResponse(responseCode = "200", description = "User created successfully", content = @Content(schema = @Schema(implementation = User.class)))
+  @ApiResponse(responseCode = "201", description = "User created successfully", content = @Content(schema = @Schema(implementation = User.class)))
   @ApiResponse(responseCode = "400", description = "Invalid input data")
   @PostMapping("")
   public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
@@ -49,7 +49,8 @@ public class UserController {
   @ApiResponse(responseCode = "400", description = "Invalid input data")
   @ApiResponse(responseCode = "404", description = "User not found")
   @PutMapping("/{id}")
-  public ResponseEntity<String> editUser(@PathVariable("id") Long id, @Valid @RequestBody User user) {
-    return ResponseEntity.ok("User updated successfully");
+  public ResponseEntity<User> editUser(@PathVariable("id") Long id, @Valid @RequestBody User user) {
+    User editUser = this.userService.editUser(id, user);
+    return ResponseEntity.ok(editUser);
   }
 }

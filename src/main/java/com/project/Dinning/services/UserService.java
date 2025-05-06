@@ -14,7 +14,11 @@ public class UserService {
   }
 
   public User getUserByDisplayName(String displayName) {
-    return userRepository.findByDisplayName(displayName);
+    User foundUser = this.userRepository.findByDisplayNameIgnoreCase(displayName);
+    if (foundUser == null) {
+      throw new EntityNotFound("User not found with this display name " + displayName);
+    }
+    return foundUser;
   }
 
   public User createUser(User user) {
@@ -35,7 +39,7 @@ public class UserService {
       throw new IllegalArgumentException("Display name cannot be null or empty");
     }
 
-    if (userRepository.findByDisplayName(user.getDisplayName()) != null) {
+    if (userRepository.findByDisplayNameIgnoreCase(user.getDisplayName()) != null) {
       throw new IllegalArgumentException("User already exists");
     }
   }

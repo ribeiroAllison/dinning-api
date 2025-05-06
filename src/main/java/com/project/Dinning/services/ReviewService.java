@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import com.project.Dinning.models.Restaurant;
+import com.project.Dinning.dto.ReviewDTO;
 import com.project.Dinning.models.Review;
 import com.project.Dinning.models.User;
 import com.project.Dinning.repositories.ReviewRepository;
@@ -28,8 +29,21 @@ public class ReviewService {
     this.restaurantRepository = restaurantRepository;
   }
 
-  public Review createReview(Review review) {
-    validateNewReview(review);
+  public Review createReviewFromDTO(ReviewDTO reviewDTO) {
+    User user = userRepository.findById(reviewDTO.getUserId())
+        .orElseThrow(() -> new EntityNotFound("User not found with ID: " + reviewDTO.getUserId()));
+
+    Restaurant restaurant = restaurantRepository.findById(reviewDTO.getRestaurantId())
+        .orElseThrow(() -> new EntityNotFound("Restaurant not found with ID: " + reviewDTO.getRestaurantId()));
+    Review review = new Review();
+    review.setUser(user);
+    review.setRestaurant(restaurant);
+    review.setPeanutScore(reviewDTO.getPeanutScore());
+    review.setEggScore(reviewDTO.getEggScore());
+    review.setDairyScore(reviewDTO.getDairyScore());
+    review.setCommentary(reviewDTO.getCommentary());
+    review.setStatus(ReviewStatus.PENDING);
+
     return this.reviewRepository.save(review);
   }
 
@@ -73,18 +87,6 @@ public class ReviewService {
           "No reviews found with status " + status.getDisplayName() + " for restaurant with id " + restaurantId);
     }
     return reviews;
-  }
-
-  private void validateNewReview(Review review) {
-    Restaurant restaurantData = review.getRestaurant();
-    User userData = review.getUser();
-
-    this.restaurantRepository.findById(restaurantData.getId())
-        .orElseThrow(() -> new EntityNotFound("Restaurant does not exist"));
-
-    this.userRepository.findById(userData.getId())
-        .orElseThrow(() -> new EntityNotFound("User does not exist"));
-
   }
 
   private Page<Review> getReviewByStatus(ReviewStatus status, Pageable pageable) {

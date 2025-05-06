@@ -31,11 +31,9 @@ public class RestaurantController {
   }
 
   @Operation(summary = "Create a new Restaurant", description = "Create a new Restaurant with the provided details")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "Restaurant created successfully", content = @Content(schema = @Schema(implementation = Restaurant.class))),
-      @ApiResponse(responseCode = "400", description = "Invalid input"),
-      @ApiResponse(responseCode = "409", description = "Restaurant already exists")
-  })
+  @ApiResponse(responseCode = "201", description = "Restaurant created successfully", content = @Content(schema = @Schema(implementation = Restaurant.class)))
+  @ApiResponse(responseCode = "400", description = "Invalid input")
+  @ApiResponse(responseCode = "409", description = "Restaurant already exists")
   @PostMapping("")
   public ResponseEntity<Restaurant> createRestaurant(@Valid @RequestBody Restaurant restaurant) {
     Restaurant createdRestaurant = this.restaurantService.createRestaurant(restaurant);
@@ -43,10 +41,8 @@ public class RestaurantController {
   }
 
   @Operation(summary = "Get a Restaurant by ID", description = "Retrieve a Restaurant by its ID")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Restaurant found", content = @Content(schema = @Schema(implementation = Restaurant.class))),
-      @ApiResponse(responseCode = "404", description = "Restaurant not found")
-  })
+  @ApiResponse(responseCode = "200", description = "Restaurant found", content = @Content(schema = @Schema(implementation = Restaurant.class)))
+  @ApiResponse(responseCode = "404", description = "Restaurant not found")
   @GetMapping("/{id}")
   public ResponseEntity<Restaurant> getRestaurantById(@PathVariable("id") Long id) {
     Restaurant restaurant = this.restaurantService.getRestaurantById(id);
@@ -54,10 +50,8 @@ public class RestaurantController {
   }
 
   @Operation(summary = "Get restaurants with filtering and pagination", description = "Returns a paginated list of restaurants. Can filter by ZIP code, allergy type, and whether the restaurant has allergy scores.")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "List of restaurants", content = @Content(schema = @Schema(implementation = Restaurant.class))),
-      @ApiResponse(responseCode = "404", description = "No Restaurant Found")
-  })
+  @ApiResponse(responseCode = "200", description = "List of restaurants", content = @Content(schema = @Schema(implementation = Restaurant.class)))
+  @ApiResponse(responseCode = "404", description = "No Restaurant Found")
   @GetMapping("")
   public ResponseEntity<Page<Restaurant>> getRestaurants(
       @RequestParam(required = false) String zipCode,

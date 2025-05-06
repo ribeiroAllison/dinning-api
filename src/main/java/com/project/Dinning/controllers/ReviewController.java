@@ -3,6 +3,7 @@ package com.project.Dinning.controllers;
 import org.springframework.web.bind.annotation.*;
 
 import com.project.Dinning.enums.ReviewStatus;
+import com.project.Dinning.dto.ReviewDTO;
 import com.project.Dinning.models.Review;
 import com.project.Dinning.services.ReviewService;
 
@@ -36,8 +37,8 @@ public class ReviewController {
   @ApiResponse(responseCode = "201", description = "Review created successfully", content = @Content(schema = @Schema(implementation = Review.class)))
   @ApiResponse(responseCode = "400", description = "Invalid input")
   @PostMapping("")
-  public ResponseEntity<Review> createReview(@Valid @RequestBody Review review) {
-    Review newReview = this.reviewService.createReview(review);
+  public ResponseEntity<Review> createReview(@Valid @RequestBody ReviewDTO reviewDTO) {
+    Review newReview = this.reviewService.createReviewFromDTO(reviewDTO);
     return new ResponseEntity<>(newReview, HttpStatus.CREATED);
   }
 

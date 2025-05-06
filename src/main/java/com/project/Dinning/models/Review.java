@@ -5,11 +5,9 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import com.project.Dinning.enums.ReviewStatus;
-
-import lombok.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,24 +15,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Getter
 @Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Table(name = "REVIEW")
 public class Review {
 
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @NonNull
   @Id
   @Column(name = "REVIEW_ID", nullable = false, updatable = false)
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @NonNull
   @JoinColumn(name = "USER_ID", nullable = false)
   @NotNull(message = "User is required")
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @NonNull
   @JoinColumn(name = "RESTAURANT_ID", nullable = false)
   @NotNull(message = "Restaurant is required")
   private Restaurant restaurant;

@@ -4,5 +4,6 @@ import com.project.Dinning.models.User;
 import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, Long> {
-  User findByDisplayName(String displayName);
+
+  User findByDisplayNameIgnoreCase(String displayName);
 }
