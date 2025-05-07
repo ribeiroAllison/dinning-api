@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "USERS", uniqueConstraints = {
     @UniqueConstraint(columnNames = "DISPLAY_NAME")

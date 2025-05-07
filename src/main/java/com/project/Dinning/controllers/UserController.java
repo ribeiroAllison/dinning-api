@@ -2,6 +2,8 @@ package com.project.Dinning.controllers;
 
 import org.springframework.web.bind.annotation.*;
 import com.project.Dinning.services.UserService;
+import com.project.Dinning.dto.UserCreateDTO;
+import com.project.Dinning.dto.UserUpdateDTO;
 
 import jakarta.validation.Valid;
 
@@ -39,8 +41,8 @@ public class UserController {
   @ApiResponse(responseCode = "201", description = "User created successfully", content = @Content(schema = @Schema(implementation = User.class)))
   @ApiResponse(responseCode = "400", description = "Invalid input data")
   @PostMapping("")
-  public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-    User newUser = this.userService.createUser(user);
+  public ResponseEntity<User> createUser(@Valid @RequestBody UserCreateDTO userDTO) {
+    User newUser = this.userService.createUser(userDTO);
     return new ResponseEntity<>(newUser, HttpStatus.CREATED);
   }
 
@@ -49,7 +51,7 @@ public class UserController {
   @ApiResponse(responseCode = "400", description = "Invalid input data")
   @ApiResponse(responseCode = "404", description = "User not found")
   @PutMapping("/{id}")
-  public ResponseEntity<User> editUser(@PathVariable("id") Long id, @Valid @RequestBody User user) {
+  public ResponseEntity<User> editUser(@PathVariable("id") Long id, @Valid @RequestBody UserUpdateDTO user) {
     User editUser = this.userService.editUser(id, user);
     return ResponseEntity.ok(editUser);
   }
