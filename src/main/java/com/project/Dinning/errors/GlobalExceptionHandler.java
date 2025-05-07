@@ -2,6 +2,7 @@ package com.project.Dinning.errors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -78,6 +79,50 @@ public class GlobalExceptionHandler {
     body.put("path", request.getDescription(false).replace("uri=", ""));
 
     return new ResponseEntity<>(body, status);
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<Object> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex, WebRequest request) {
+
+    String errorMessage = ex.getMessage();
+    String userFriendlyMessage = errorMessage;
+
+    // Check if this is an enum deserialization error
+    if (errorMessage != null && errorMessage.contains("not one of the values accepted for Enum class")) {
+      // Extract the enum class name and valid values
+      String enumClassName = "enum type";
+      String validValues = "unknown";
+
+      // Try to extract the enum class name
+      int enumClassStart = errorMessage.indexOf("type `") + 6;
+      int enumClassEnd = errorMessage.indexOf("` from");
+      if (enumClassStart > 6 && enumClassEnd > enumClassStart) {
+        enumClassName = errorMessage.substring(enumClassStart, enumClassEnd);
+        // Get just the simple class name
+        if (enumClassName.contains(".")) {
+          enumClassName = enumClassName.substring(enumClassName.lastIndexOf('.') + 1);
+        }
+      }
+
+      // Try to extract valid values
+      int valuesStart = errorMessage.indexOf("[");
+      int valuesEnd = errorMessage.indexOf("]");
+      if (valuesStart >= 0 && valuesEnd > valuesStart) {
+        validValues = errorMessage.substring(valuesStart, valuesEnd + 1);
+      }
+
+      userFriendlyMessage = "Invalid value for " + enumClassName + ". Accepted values are: " + validValues;
+    }
+
+    Map<String, Object> body = new HashMap<>();
+    body.put("timestamp", LocalDateTime.now());
+    body.put("status", HttpStatus.BAD_REQUEST.value());
+    body.put("error", "Bad Request");
+    body.put("message", userFriendlyMessage);
+    body.put("path", request.getDescription(false).replace("uri=", ""));
+
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
 }
