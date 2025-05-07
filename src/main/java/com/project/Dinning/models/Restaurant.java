@@ -52,19 +52,19 @@ public class Restaurant {
   @Basic(optional = true)
   @Min(value = 1, message = "Peanut score must be at least 1")
   @Max(value = 5, message = "Peanut score cannot be greater than 5")
-  private Double peanutScoreAverage;
+  private Double peanutScore;
 
   @Column(name = "EGG_SCORE")
   @Basic(optional = true)
   @Min(value = 1, message = "Egg score must be at least 1")
   @Max(value = 5, message = "Egg score cannot be greater than 5")
-  private Double eggScoreAverage;
+  private Double eggScore;
 
   @Column(name = "DAIRY_SCORE")
   @Basic(optional = true)
   @Min(value = 1, message = "Dairy score must be at least 1")
   @Max(value = 5, message = "Dairy score cannot be greater than 5")
-  private Double dairyScoreAverage;
+  private Double dairyScore;
 
   /**
    * Custom constructor that ensures scores are null on creation

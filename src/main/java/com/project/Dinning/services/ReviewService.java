@@ -96,9 +96,9 @@ public class ReviewService {
   private void updateRestaurantScore(Long restaurnantId) {
     Restaurant restaurant = this.restaurantRepository.findById(restaurnantId)
         .orElseThrow(() -> new EntityNotFound("Restaurant not found with id " + restaurnantId));
-    Double originalEggScore = restaurant.getEggScoreAverage();
-    Double originalDairyScore = restaurant.getDairyScoreAverage();
-    Double originalPeanutScore = restaurant.getPeanutScoreAverage();
+    Double originalEggScore = restaurant.getEggScore();
+    Double originalDairyScore = restaurant.getDairyScore();
+    Double originalPeanutScore = restaurant.getPeanutScore();
     List<Review> approvedReviews = this.reviewRepository.findApprovedReviewsByRestaurant(restaurnantId);
 
     double avgEggScore = approvedReviews.stream()
@@ -119,13 +119,13 @@ public class ReviewService {
         .average()
         .orElse(0.0);
 
-    restaurant.setEggScoreAverage(avgEggScore > 0.0 ? avgEggScore : null);
-    restaurant.setDairyScoreAverage(avgDairyScore > 0.0 ? avgDairyScore : null);
-    restaurant.setPeanutScoreAverage(avgPeanutScore > 0.0 ? avgPeanutScore : null);
+    restaurant.setEggScore(avgEggScore > 0.0 ? avgEggScore : null);
+    restaurant.setDairyScore(avgDairyScore > 0.0 ? avgDairyScore : null);
+    restaurant.setPeanutScore(avgPeanutScore > 0.0 ? avgPeanutScore : null);
 
-    if (!Objects.equals(restaurant.getEggScoreAverage(), originalEggScore)
-        || !Objects.equals(restaurant.getDairyScoreAverage(), originalDairyScore)
-        || !Objects.equals(restaurant.getPeanutScoreAverage(), originalPeanutScore)) {
+    if (!Objects.equals(restaurant.getEggScore(), originalEggScore)
+        || !Objects.equals(restaurant.getDairyScore(), originalDairyScore)
+        || !Objects.equals(restaurant.getPeanutScore(), originalPeanutScore)) {
       this.restaurantRepository.save(restaurant);
     }
 
