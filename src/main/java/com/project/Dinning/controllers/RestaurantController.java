@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.Dinning.services.RestaurantService;
 import com.project.Dinning.dto.RestaurantCreateDTO;
+import com.project.Dinning.enums.ReviewStatus;
 
 import jakarta.validation.Valid;
 
@@ -18,6 +19,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 
 @RestController
 @RequestMapping("/restaurants")
@@ -57,7 +60,11 @@ public class RestaurantController {
       @RequestParam(required = false) String zipCode,
       @RequestParam(required = false) String allergy,
       @RequestParam(required = false) Boolean hasScore,
-      Pageable pageable) {
+      @RequestParam(required = false) ReviewStatus status,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(defaultValue = "id") String sort) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
     Page<Restaurant> restaurants = this.restaurantService.getRestaurants(zipCode, allergy, hasScore, pageable);
     return ResponseEntity.ok(restaurants);
 

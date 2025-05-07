@@ -93,14 +93,18 @@ public class ReviewController {
     return ResponseEntity.ok(this.reviewService.getReviewDTOById(id));
   }
 
-  // This is getting its Pageable set up from properties file and automatically
-  // implementing it
   @Operation(summary = "Get approved reviews by restaurant ID", description = "Retrieve approved reviews for a specific restaurant")
   @ApiResponse(responseCode = "200", description = "List of approved reviews", content = @Content(schema = @Schema(implementation = Review.class)))
   @ApiResponse(responseCode = "404", description = "No Reviews Found")
   @GetMapping("/approved/{restaurant_id}")
   public ResponseEntity<Page<ReviewResponseDTO>> getApprovedReviewsByRestaurant(
-      @PathVariable("restaurant_id") Long restaurantId, Pageable pageable) {
+      @PathVariable("restaurant_id") Long restaurantId,
+      @RequestParam(required = false) ReviewStatus status,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(defaultValue = "id") String sort) {
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
     return ResponseEntity.ok(this.reviewService.getByApprovedStatusAndId(restaurantId, pageable));
   }
 }
