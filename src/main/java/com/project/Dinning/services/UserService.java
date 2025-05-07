@@ -39,16 +39,21 @@ public class UserService {
     User existingUser = userRepository.findById(id)
         .orElseThrow(() -> new EntityNotFound("User not found"));
 
-    if (dtoUser.getCity() != null)
+    if (dtoUser.getCity() != null) {
       existingUser.setCity(dtoUser.getCity());
-    if (dtoUser.getZipCode() != null)
+    }
+    if (dtoUser.getZipCode() != null) {
       existingUser.setZipCode(dtoUser.getZipCode());
-    if (dtoUser.getPeanutAllergy() != null)
+    }
+    if (dtoUser.getPeanutAllergy() != null) {
       existingUser.setPeanutAllergy(dtoUser.getPeanutAllergy());
-    if (dtoUser.getEggAllergy() != null)
+    }
+    if (dtoUser.getEggAllergy() != null) {
       existingUser.setEggAllergy(dtoUser.getEggAllergy());
-    if (dtoUser.getDairyAllergy() != null)
+    }
+    if (dtoUser.getDairyAllergy() != null) {
       existingUser.setDairyAllergy(dtoUser.getDairyAllergy());
+    }
     return userRepository.save(existingUser);
   }
 
