@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReviewDTO {
-  private Long id;
 
   @NotNull(message = "User ID is required")
   private Long userId;
